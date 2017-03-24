@@ -31,9 +31,9 @@ typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
     AFNetworkReachabilityStatusUnknown          = -1,
     /** 无网络 */
     AFNetworkReachabilityStatusNotReachable     = 0,
-    /** WWAN 手机自带网络 */
+    /** WWAN -> Wireless Wide Area Network，无线广域网，手机自带网络，蜂窝网（2G、3G、4G）*/
     AFNetworkReachabilityStatusReachableViaWWAN = 1,
-    /** Wifi */
+    /** WiFi */
     AFNetworkReachabilityStatusReachableViaWiFi = 2,
 };
 
@@ -77,7 +77,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- Posted when network reachability changes.
+ 当网络可到达行改变时，发送通知。
+ 
  This notification assigns no notification object. The `userInfo` dictionary contains an `NSNumber` object under the `AFNetworkingReachabilityNotificationStatusItem` key, representing the `AFNetworkReachabilityStatus` value for the current network reachability.
 
  @warning In order for network reachability to be monitored, include the `SystemConfiguration` framework in the active target's "Link Binary With Library" build phase, and add `#import <SystemConfiguration/SystemConfiguration.h>` to the header prefix of the project (`Prefix.pch`).
@@ -85,8 +86,17 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSString * const AFNetworkingReachabilityDidChangeNotification;
 FOUNDATION_EXPORT NSString * const AFNetworkingReachabilityNotificationStatusItem;
 
-/** 根据状态获取字符串 */
+/** 
+ *  @description 根据状态获取字符串 -> 一个C语言格式的函数
+ *  @param status 状态参数
+ */
 FOUNDATION_EXPORT NSString * AFStringFromNetworkReachabilityStatus(AFNetworkReachabilityStatus status);
 
 NS_ASSUME_NONNULL_END
 #endif
+
+
+
+
+
+

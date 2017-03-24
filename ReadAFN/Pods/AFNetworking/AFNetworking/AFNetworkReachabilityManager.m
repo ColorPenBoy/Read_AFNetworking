@@ -28,11 +28,20 @@
 #import <ifaddrs.h>
 #import <netdb.h>
 
+/** 网络环境发生改变的时候接受的通知 */
 NSString * const AFNetworkingReachabilityDidChangeNotification = @"com.alamofire.networking.reachability.change";
+/** 网络环境发生变化是会发送一个通知，同时携带一组状态数据，根据这个key来取出网络状态 */
 NSString * const AFNetworkingReachabilityNotificationStatusItem = @"AFNetworkingReachabilityNotificationStatusItem";
 
+/** 
+ *  定义一个网络变化的回调
+ *  @param status 网络状态参数 -> 枚举
+ */
 typedef void (^AFNetworkReachabilityStatusBlock)(AFNetworkReachabilityStatus status);
 
+/** 
+ *  把枚举的值转换成字符串
+ */
 NSString * AFStringFromNetworkReachabilityStatus(AFNetworkReachabilityStatus status) {
     switch (status) {
         case AFNetworkReachabilityStatusNotReachable:
@@ -47,11 +56,26 @@ NSString * AFStringFromNetworkReachabilityStatus(AFNetworkReachabilityStatus sta
     }
 }
 
+/** 
+ *  @description 根据SCNetworkReachabilityFlags网络标记，转换成我们开发中经常使用的网络状态
+ *  @param flags 输入的网络标记
+ *  @return 状态枚举
+ */
 static AFNetworkReachabilityStatus AFNetworkReachabilityStatusForFlags(SCNetworkReachabilityFlags flags) {
+    // 是否能够到达
     BOOL isReachable = ((flags & kSCNetworkReachabilityFlagsReachable) != 0);
+    // 在联网前，需要建立连接
     BOOL needsConnection = ((flags & kSCNetworkReachabilityFlagsConnectionRequired) != 0);
-    BOOL canConnectionAutomatically = (((flags & kSCNetworkReachabilityFlagsConnectionOnDemand ) != 0) || ((flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0));
+    // 是否可以自动连接
+    BOOL canConnectionAutomatically = (((flags & kSCNetworkReachabilityFlagsConnectionOnDemand ) != 0)
+                                    || ((flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0));
+    
+    // 是否可以连接，在不需要用户手动设置的前提下
     BOOL canConnectWithoutUserInteraction = (canConnectionAutomatically && (flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0);
+    
+    // 是否可以联网的条件：
+    // 1. 能够到达
+    // 2. 不需要建立连接，或者不需要用户手动设置连接，就表示能够连接到网络
     BOOL isNetworkReachable = (isReachable && (!needsConnection || canConnectWithoutUserInteraction));
 
     AFNetworkReachabilityStatus status = AFNetworkReachabilityStatusUnknown;
