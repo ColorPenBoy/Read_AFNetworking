@@ -101,6 +101,9 @@ static AFNetworkReachabilityStatus AFNetworkReachabilityStatusForFlags(SCNetwork
  * as they are sent. If notifications are sent directly, it is possible that
  * a queued notification (for an earlier status condition) is processed after
  * the later update, resulting in the listener being left in the wrong state.
+ *
+ *  接受网络变化有两种方式：1.Block 2.通知
+ *  为了保证两种方式的数据统一，把这个过程封装到一个函数中
  */
 static void AFPostReachabilityStatusChange(SCNetworkReachabilityFlags flags, AFNetworkReachabilityStatusBlock block) {
     AFNetworkReachabilityStatus status = AFNetworkReachabilityStatusForFlags(flags);
