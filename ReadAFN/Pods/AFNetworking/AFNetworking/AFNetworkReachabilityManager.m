@@ -159,8 +159,11 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 
     return manager;
 }
-
+/**
+ 通过一个Socket地址来初始化
+ */
 + (instancetype)managerForAddress:(const void *)address {
+    /** CFRetain()之后要手动释放CFRelease() */
     SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr *)address);
     AFNetworkReachabilityManager *manager = [[self alloc] initWithReachability:reachability];
 
@@ -172,6 +175,7 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 + (instancetype)manager
 {
 #if (defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= 90000) || (defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 101100)
+    /** IPv6 是iOS 9 和 Mac OS X 10.11后推出，版本判断 */
     struct sockaddr_in6 address;
     bzero(&address, sizeof(address));
     address.sin6_len = sizeof(address);
@@ -224,7 +228,7 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
     return self.networkReachabilityStatus == AFNetworkReachabilityStatusReachableViaWiFi;
 }
 
-#pragma mark -
+#pragma mark - 两个核心方法
 
 - (void)startMonitoring {
     [self stopMonitoring];
@@ -244,6 +248,7 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 
     };
 
+    // C语言结构体
     SCNetworkReachabilityContext context = {0, (__bridge void *)callback, AFNetworkReachabilityRetainCallback, AFNetworkReachabilityReleaseCallback, NULL};
     SCNetworkReachabilitySetCallback(self.networkReachability, AFNetworkReachabilityCallback, &context);
     SCNetworkReachabilityScheduleWithRunLoop(self.networkReachability, CFRunLoopGetMain(), kCFRunLoopCommonModes);
